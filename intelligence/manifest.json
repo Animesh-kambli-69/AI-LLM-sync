@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.1",
+  "description": "Conductor AI Intelligence System - Shared data store for all local AI agents",
+  "paths": {
+    "memory": "intelligence/memory",
+    "sessions": "intelligence/sessions",
+    "lessons": "intelligence/lessons",
+    "outputs": "intelligence/outputs",
+    "context": "intelligence/context"
+  },
+  "memory": {
+    "max_snippets": 1000,
+    "embedding_model": "nomic-embed-text:v1.5"
+  },
+  "model_wiring": {
+    "planner": [
+      "llama3.1:8b"
+    ],
+    "worker": "qwen2.5-coder:7b",
+    "critic": "qwen2.5-coder:7b",
+    "synthesizer": "llama3.1:8b"
+  },
+  "sandbox": {
+    "description": "STRICT allowlist. Agents can ONLY read/write paths listed here. Add your workspace folders here.",
+    "allowed_paths": [
+      "C:/Users/Ani/OneDrive/Desktop/codes/Pure Shit",
+      "C:/Users/Ani/OneDrive/Desktop/codes/AI LLM sync"
+    ],
+    "allow_reads_outside_sandbox": false
+  },
+  "approval": {
+    "description": "Controls when the system must pause and ask you before proceeding.",
+    "require_approval_for": {
+      "file_write": false,
+      "file_overwrite": false,
+      "file_delete": true,
+      "plan_change": false,
+      "critic_loop_retry": false,
+      "memory_write": false
+    }
+  }
+}

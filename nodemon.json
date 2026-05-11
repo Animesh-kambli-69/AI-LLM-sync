@@ -1,0 +1,10 @@
+{
+  "watch": ["server.js", "Conductor.js", "InferenceEngine.js", "FileSystemManager.js", "MemoryManager.js", "ApprovalGate.js", "SandboxManager.js"],
+  "ignore": [
+    "intelligence/**",
+    "node_modules/**",
+    "src/**",
+    "dist/**",
+    "build/**"
+  ]
+}

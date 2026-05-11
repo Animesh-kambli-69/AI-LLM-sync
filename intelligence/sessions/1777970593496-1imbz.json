@@ -1,0 +1,21 @@
+{
+  "id": "1777970593496-1imbz",
+  "task": "summarize binary tree treaversal",
+  "events": [
+    {
+      "event": "Planner created 1-step plan",
+      "at": "2026-05-05T08:44:15.402Z"
+    },
+    {
+      "event": "Worker completed step: summarize binary tree treaversal",
+      "at": "2026-05-05T08:44:35.259Z"
+    },
+    {
+      "event": "Critic: APPROVED",
+      "at": "2026-05-05T08:44:39.943Z"
+    }
+  ],
+  "startedAt": "2026-05-05T08:43:13.496Z",
+  "status": "complete",
+  "endedAt": "2026-05-05T08:44:39.947Z"
+}
