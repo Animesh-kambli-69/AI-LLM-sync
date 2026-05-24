@@ -49,6 +49,7 @@ export class Conductor {
     this.abortController = new AbortController();
     this.isAborted = false;
     this.lastOutputPath = null;
+    this.memoryCache = new Map(); // Optimization: Cache for memory recalls
   }
 
   async abort() {
@@ -111,8 +112,24 @@ export class Conductor {
     return inlineFileContext;
   }
 
-  async _runNonCodingTask(intentInfo, task) {
-    const inlineFileContext = await this._buildInlineFileContext(task);
+  // ── Optimization: Cached memory recalls ────────────────────────
+  async cachedRecall(query, topK = 5) {
+    const key = `${query}:${topK}`;
+    if (this.memoryCache.has(key)) {
+      return this.memoryCache.get(key);
+    }
+    const results = await this.memory.recall(query, topK);
+    this.memoryCache.set(key, results);
+    return results;
+  }
+
+  // Clear cache at start of each session
+  _clearCache() {
+    this.memoryCache.clear();
+  }
+
+  async _runNonCodingTask(intentInfo, task, fileContext = null) {
+    const inlineFileContext = fileContext || await this._buildInlineFileContext(task);
     const baseTask = intentInfo.strippedTask?.length ? intentInfo.strippedTask : "";
     const kind = intentInfo.intent === "summarize" ? "summary" : "explanation";
     const prompt =
@@ -144,7 +161,7 @@ Provide a clear ${kind}.
     console.log("🧠 Planner is analyzing your request...");
 
     const savedContext = await this.memory.getContext();
-    const lessons = await this.memory.recall(state.task, 5);
+    const lessons = await this.cachedRecall(state.task, 5); // Optimization: Use cached recall
     const lessonBlock = lessons.length
       ? "Lessons from past sessions:\n" + lessons.map((l) => `- ${l.text}`).join("\n")
       : "";
@@ -228,7 +245,7 @@ Output ONLY a valid JSON array of strings. No explanation. No markdown.`;
     }
 
     await this.memory.logEvent(`Planner created ${finalPlan.length}-step plan`);
-    return { plan: finalPlan, currentStep: 0 };
+    return { plan: finalPlan, currentStep: 0, fileContext: inlineFileContext }; // Optimization: Cache file context in state
   }
 
   async _workerNode(state) {
@@ -238,13 +255,13 @@ Output ONLY a valid JSON array of strings. No explanation. No markdown.`;
     const spinner = ora(chalk.yellow(`⚙️  Worker [${state.currentStep + 1}/${state.plan.length}]: ${step}`)).start();
     console.log(`⚙️  Worker executing step [${state.currentStep + 1}/${state.plan.length}]: ${step}`);
 
-    const memories = await this.memory.recall(step, 3);
+    const memories = await this.cachedRecall(step, 3); // Optimization: Use cached recall
     const memBlock = memories.length
       ? "Related past knowledge:\n" + memories.map((m) => `- ${m.text}`).join("\n")
       : "";
 
-    // Automatically detect and read files mentioned in the original task
-    const inlineFileContext = await this._buildInlineFileContext(state.task);
+    // Optimization: Use cached file context from planner state (avoid re-reading)
+    const inlineFileContext = state.fileContext || "";
 
     const prompt =
       `You are an expert software engineer working inside a sandboxed workspace.
@@ -284,7 +301,7 @@ Write complete, production-quality code. Output ONLY the code. No markdown fence
     const spinner = ora(chalk.magenta("🔍 Critic reviewing...")).start();
     console.log("🔍 Critic is reviewing the code...");
 
-    const lessons = await this.memory.recall(`code review ${state.plan[state.currentStep]}`, 3);
+    const lessons = await this.cachedRecall(`code review ${state.plan[state.currentStep]}`, 3); // Optimization: Use cached recall
     const lessonBlock = lessons.length
       ? "Known anti-patterns:\n" + lessons.map((l) => `- ${l.text}`).join("\n")
       : "";
@@ -365,6 +382,7 @@ Check for: bugs, logic errors, missing edge-cases, security issues, bad patterns
   async run(task) {
     this.isAborted = false;
     this.abortController = new AbortController();
+    this._clearCache(); // Optimization: Clear cache for new session
     if (!task || !task.trim()) {
       console.log(chalk.yellow("\n  Task was empty. Please describe what you want."));
       return { aborted: true };
@@ -383,7 +401,9 @@ Check for: bugs, logic errors, missing edge-cases, security issues, bad patterns
     const intentInfo = this._detectIntent(task);
     if (intentInfo.intent !== "code") {
       try {
-        const response = await this._runNonCodingTask(intentInfo, task);
+        // Optimization: Pre-load file context once for non-coding tasks
+        const fileContext = await this._buildInlineFileContext(task);
+        const response = await this._runNonCodingTask(intentInfo, task, fileContext);
         if (this.isAborted) {
           console.log(chalk.yellow("\n  Task was cancelled before output write."));
           return { aborted: true };

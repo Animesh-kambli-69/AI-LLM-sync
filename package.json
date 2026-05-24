@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.9",
     "@langchain/core": "^1.1.43",
     "@langchain/langgraph": "^1.2.9",
     "@langchain/ollama": "^1.2.7",

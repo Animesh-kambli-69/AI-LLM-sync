@@ -17,8 +17,8 @@
       "llama3.1:8b"
     ],
     "worker": "qwen2.5-coder:7b",
-    "critic": "qwen2.5-coder:7b",
-    "synthesizer": "llama3.1:8b"
+    "critic": "mistral:7b",
+    "synthesizer": "mistral:7b"
   },
   "sandbox": {
     "description": "STRICT allowlist. Agents can ONLY read/write paths listed here. Add your workspace folders here.",

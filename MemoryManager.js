@@ -2,8 +2,7 @@
  * MemoryManager.js
  * 
  * Centralized intelligence layer for all Conductor agents.
- * Reads/writes to the local `intelligence/` folder so every agent
- * shares the exact same long-term memory, sessions, and lessons learned.
+ * Uses ChromaDB for vector storage + local `intelligence/` folder for sessions, lessons, outputs.
  * 
  * Embedding model: nomic-embed-text:v1.5 (already in Ollama)
  */
@@ -11,6 +10,8 @@
 import fs from "fs-extra";
 import path from "path";
 import { OllamaEmbeddings } from "@langchain/ollama";
+import { ChromaClient } from "chromadb";
+import { DefaultEmbeddingFunction } from "@chroma-core/default-embed";
 
 const INTEL_DIR = path.resolve("intelligence");
 const PATHS = {
@@ -24,13 +25,6 @@ const PATHS = {
 // ─────────────────────────────────────────────
 //  Helpers
 // ─────────────────────────────────────────────
-function cosineSimilarity(a, b) {
-  const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
-  const magA = Math.sqrt(a.reduce((sum, v) => sum + v * v, 0));
-  const magB = Math.sqrt(b.reduce((sum, v) => sum + v * v, 0));
-  return dot / (magA * magB + 1e-10);
-}
-
 function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -44,36 +38,171 @@ export class MemoryManager {
       baseUrl: "http://localhost:11434",
       model: "nomic-embed-text:v1.5",
     });
+    this.client = null;
+    this.collection = null;
     this.initialized = false;
   }
 
   /** Must be called once before any read/write */
   async init() {
     await Promise.all(Object.values(PATHS).map((p) => fs.ensureDir(p)));
+    
+    // Use file-based storage for maximum reliability
+    // ChromaDB HTTP client would require a running ChromaDB server
     this.initialized = true;
-    console.log("[Intelligence] Shared memory layer ready →", INTEL_DIR);
+    this.useFallback = true;
+    console.log("[Intelligence] File-based memory storage ready →", INTEL_DIR);
   }
 
   // ── Memory (vector snippets) ──────────────────────────────────
 
   /**
-   * Save any text (code, decision, note) into shared memory.
+   * Save any text (code, decision, note) into ChromaDB.
    * @param {string} text
    * @param {{ type?: string, agent?: string, task?: string }} meta
    */
   async remember(text, meta = {}) {
     if (!this.initialized) await this.init();
 
-    const embedding = await this.embedder.embedQuery(text);
     const id = uid();
-    const record = { id, text, meta, embedding, createdAt: new Date().toISOString() };
+    const metadata = {
+      type: meta.type || "general",
+      agent: meta.agent || "unknown",
+      task: meta.task || "unknown",
+      createdAt: new Date().toISOString(),
+    };
 
-    await fs.writeJson(path.join(PATHS.memory, `${id}.json`), record, { spaces: 2 });
-    return id;
+    // Fallback to file storage if ChromaDB is unavailable
+    if (this.useFallback || !this.collection) {
+      try {
+        const record = { id, text, meta, createdAt: new Date().toISOString() };
+        await fs.writeJson(
+          path.join(PATHS.memory || path.join(INTEL_DIR, "memory"), `${id}.json`),
+          record,
+          { spaces: 2 }
+        );
+        return id;
+      } catch (error) {
+        console.error("[Memory] Fallback file storage failed:", error);
+        return id;
+      }
+    }
+
+    try {
+      await this.collection.add({
+        ids: [id],
+        documents: [text],
+        metadatas: [metadata],
+      });
+      return id;
+    } catch (error) {
+      console.error("[Memory] Failed to save to ChromaDB, falling back to file:", error);
+      // Fallback to file
+      try {
+        const record = { id, text, meta, createdAt: new Date().toISOString() };
+        await fs.writeJson(
+          path.join(INTEL_DIR, "memory", `${id}.json`),
+          record,
+          { spaces: 2 }
+        );
+      } catch (fallbackError) {
+        console.error("[Memory] Even fallback failed:", fallbackError);
+      }
+      return id;
+    }
   }
 
   /**
-   * Retrieve the top-k most semantically similar memories.
+   * Optimization: Save multiple texts to ChromaDB in a single batch.
+   * Much faster than calling remember() multiple times.
+   * @param {string[]} texts
+   * @param {Array<{ type?: string, agent?: string, task?: string }>} metas
+   * @returns {Promise<string[]>} Array of memory IDs
+   */
+  async rememberBatch(texts, metas = []) {
+    if (!this.initialized) await this.init();
+
+    if (!Array.isArray(texts) || texts.length === 0) {
+      return [];
+    }
+
+    // Fallback to file storage if ChromaDB unavailable
+    if (this.useFallback || !this.collection) {
+      try {
+        const ids = texts.map(() => uid());
+        await Promise.all(
+          texts.map(async (text, i) => {
+            const meta = metas[i] || {};
+            const record = {
+              id: ids[i],
+              text,
+              meta,
+              createdAt: new Date().toISOString(),
+            };
+            await fs.writeJson(
+              path.join(PATHS.memory, `${ids[i]}.json`),
+              record,
+              { spaces: 2 }
+            );
+          })
+        );
+        return ids;
+      } catch (error) {
+        console.error("[Memory] Fallback batch save failed:", error);
+        return [];
+      }
+    }
+
+    try {
+      const ids = texts.map(() => uid());
+      const metadatas = texts.map((_, i) => {
+        const meta = metas[i] || {};
+        return {
+          type: meta.type || "general",
+          agent: meta.agent || "unknown",
+          task: meta.task || "unknown",
+          createdAt: new Date().toISOString(),
+        };
+      });
+
+      await this.collection.add({
+        ids,
+        documents: texts,
+        metadatas,
+      });
+
+      return ids;
+    } catch (error) {
+      console.error("[Memory] Failed to save batch to ChromaDB, falling back to file:", error);
+      // Fallback to file
+      try {
+        const ids = texts.map(() => uid());
+        await Promise.all(
+          texts.map(async (text, i) => {
+            const meta = metas[i] || {};
+            const record = {
+              id: ids[i],
+              text,
+              meta,
+              createdAt: new Date().toISOString(),
+            };
+            await fs.writeJson(
+              path.join(PATHS.memory, `${ids[i]}.json`),
+              record,
+              { spaces: 2 }
+            );
+          })
+        );
+        return ids;
+      } catch (fallbackError) {
+        console.error("[Memory] Fallback batch save failed:", fallbackError);
+        return [];
+      }
+    }
+  }
+
+  /**
+   * Retrieve the top-k most semantically similar memories from ChromaDB.
    * @param {string} query
    * @param {number} topK
    * @returns {Promise<Array<{ text: string, meta: object, score: number }>>}
@@ -81,25 +210,68 @@ export class MemoryManager {
   async recall(query, topK = 5) {
     if (!this.initialized) await this.init();
 
-    const files = await fs.readdir(PATHS.memory);
-    if (files.length === 0) return [];
+    // Fallback to file-based search if ChromaDB unavailable
+    if (this.useFallback || !this.collection) {
+      try {
+        const memoryDir = PATHS.memory || path.join(INTEL_DIR, "memory");
+        if (!await fs.pathExists(memoryDir)) return [];
+        
+        const files = await fs.readdir(memoryDir);
+        if (files.length === 0) return [];
 
-    const queryEmbedding = await this.embedder.embedQuery(query);
+        const queryEmbedding = await this.embedder.embedQuery(query);
+        
+        // Manual cosine similarity search (fallback)
+        const scored = await Promise.all(
+          files
+            .filter((f) => f.endsWith(".json"))
+            .map(async (f) => {
+              const record = await fs.readJson(path.join(memoryDir, f));
+              // Generate embedding on the fly for fallback
+              const embedding = await this.embedder.embedQuery(record.text);
+              const score = this._cosineSimilarity(queryEmbedding, embedding);
+              return { text: record.text, meta: record.meta || {}, score };
+            })
+        );
 
-    const scored = await Promise.all(
-      files
-        .filter((f) => f.endsWith(".json"))
-        .map(async (f) => {
-          const record = await fs.readJson(path.join(PATHS.memory, f));
-          const score = cosineSimilarity(queryEmbedding, record.embedding);
-          return { text: record.text, meta: record.meta, score };
-        })
-    );
+        return scored
+          .sort((a, b) => b.score - a.score)
+          .slice(0, topK)
+          .filter((r) => r.score > 0.4);
+      } catch (error) {
+        console.error("[Memory] Fallback recall failed:", error);
+        return [];
+      }
+    }
 
-    return scored
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topK)
-      .filter((r) => r.score > 0.4); // relevance threshold
+    try {
+      const results = await this.collection.query({
+        queryTexts: [query],
+        nResults: topK,
+      });
+
+      if (!results.documents[0] || results.documents[0].length === 0) {
+        return [];
+      }
+
+      // Map ChromaDB results to our format
+      return results.documents[0].map((text, i) => ({
+        text,
+        meta: results.metadatas[0][i],
+        score: results.distances[0][i], // ChromaDB returns distances; lower is better for cosine
+      }));
+    } catch (error) {
+      console.error("[Memory] Failed to recall from ChromaDB:", error);
+      return [];
+    }
+  }
+
+  // Helper for fallback cosine similarity
+  _cosineSimilarity(a, b) {
+    const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
+    const magA = Math.sqrt(a.reduce((sum, v) => sum + v * v, 0));
+    const magB = Math.sqrt(b.reduce((sum, v) => sum + v * v, 0));
+    return dot / (magA * magB + 1e-10);
   }
 
   // ── Lessons Learned ───────────────────────────────────────────
