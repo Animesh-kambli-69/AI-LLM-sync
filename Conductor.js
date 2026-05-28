@@ -63,6 +63,18 @@ export class Conductor {
   _detectIntent(task) {
     const trimmed = (task || "").trim();
     const normalized = trimmed.toLowerCase();
+    
+    // Check for keywords ANYWHERE in the task (not just at start)
+    const hasExplain = /\b(explain|explanation|describe|clarify)\b/.test(normalized);
+    const hasSummarize = /\b(summarize|summary|tldr|tl;?dr|tl dr)\b/.test(normalized);
+    const hasCode = /\b(code|write|implement|create|build|generate)\b/.test(normalized);
+    
+    // If task asks for BOTH code AND explanation
+    if (hasCode && hasExplain) {
+      return { intent: "code-with-explanation", strippedTask: trimmed };
+    }
+    
+    // Prefix-based detection for pure non-coding tasks
     const detectors = [
       { intent: "summarize", prefixes: ["summarize", "summary", "tldr", "tl;dr"] },
       { intent: "explain", prefixes: ["explain", "explanation", "describe", "clarify"] },
@@ -93,6 +105,11 @@ export class Conductor {
       }
     }
 
+    // Default to code if keywords suggest it
+    if (hasCode) return { intent: "code", strippedTask: trimmed };
+    if (hasSummarize) return { intent: "summarize", strippedTask: trimmed };
+    if (hasExplain) return { intent: "explain", strippedTask: trimmed };
+    
     return { intent: "code", strippedTask: trimmed };
   }
 
@@ -399,7 +416,7 @@ Check for: bugs, logic errors, missing edge-cases, security issues, bad patterns
     await this.memory.updateContext(`Session: ${task}\n\n${projectContext}`);
 
     const intentInfo = this._detectIntent(task);
-    if (intentInfo.intent !== "code") {
+    if (intentInfo.intent !== "code" && intentInfo.intent !== "code-with-explanation") {
       try {
         // Optimization: Pre-load file context once for non-coding tasks
         const fileContext = await this._buildInlineFileContext(task);
@@ -457,10 +474,19 @@ Check for: bugs, logic errors, missing edge-cases, security issues, bad patterns
         return { aborted: true };
       }
 
+      // If task asks for explanation alongside code, generate it
+      let finalOutput = finalState.code;
+      if (intentInfo.intent === "code-with-explanation") {
+        const explanationPrompt = `Provide a clear, concise explanation of this code:\n\n${finalState.code}\n\nExplanation should cover: what it does, how it works, key components, and use cases.`;
+        console.log(chalk.blue("🔄 Generating explanation for code..."));
+        const explanation = await this.engine.ask(explanationPrompt, "synthesizer", { signal: this.abortController.signal });
+        finalOutput = `# Code Implementation\n\n\`\`\`\n${finalState.code}\n\`\`\`\n\n# Explanation\n\n${explanation}`;
+      }
+
       // Save output through the gated FileSystemManager
       // This will ask for approval before writing to disk
-      const outPath = `intelligence/outputs/output_${sessionId}.js`;
-      const written = await this.fs.writeFile(outPath, finalState.code);
+      const outPath = `intelligence/outputs/output_${sessionId}.md`;
+      const written = await this.fs.writeFile(outPath, finalOutput);
       if (!written) {
         console.log(chalk.yellow("\n  Output write declined by user."));
         return { aborted: true, outputPath: null };

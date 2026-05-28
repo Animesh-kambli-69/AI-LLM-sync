@@ -20,6 +20,20 @@
     "critic": "mistral:7b",
     "synthesizer": "mistral:7b"
   },
+  "inference": {
+    "cpu_optimizations": {
+      "enabled": true,
+      "max_parallel_requests": 3,
+      "response_streaming": true,
+      "aggressive_unload": false,
+      "model_keep_alive_ms": 120000,
+      "max_cached_models": 4,
+      "enable_memory_monitoring": true,
+      "auto_reduce_parallel": true,
+      "vram_threshold_percent": 85,
+      "temperature": 0.1
+    }
+  },
   "sandbox": {
     "description": "STRICT allowlist. Agents can ONLY read/write paths listed here. Add your workspace folders here.",
     "allowed_paths": [

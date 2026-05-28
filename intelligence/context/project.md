@@ -1,4 +1,4 @@
-Session: give me a code for circular linked list and explain it 
+Session: give me code for java api callling 
 
 
 Declared Workspace Files:
@@ -142,6 +142,12 @@ Declared Workspace Files:
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\simple\BlobTest.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\simple\AuthenticationTest.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\simple\AuthenticationTest.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\RetrievalPerfTest.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\RetrievalPerfTest.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\LoadStorePerfTest.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\LoadStorePerfTest.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\BasePerfTest.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\BasePerfTest.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\UtilsRegressionTest.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\UtilsRegressionTest.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\SyntaxRegressionTest.java.bak
@@ -184,12 +190,8 @@ Declared Workspace Files:
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\CachedRowsetTest.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\BlobRegressionTest.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\regression\BlobRegressionTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\RetrievalPerfTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\RetrievalPerfTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\LoadStorePerfTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\LoadStorePerfTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\BasePerfTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\perf\BasePerfTest.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\TlsSettings.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\LocalizedErrorMessages.properties
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\x\internal\XProtocolTest.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\x\internal\XProtocolTest.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\testsuite\x\internal\XProtocolAuthTest.java.bak
@@ -268,41 +270,39 @@ Declared Workspace Files:
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\legacy\java\com\mysql\jdbc\SocketFactory.java
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\legacy\java\com\mysql\jdbc\Driver.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\legacy\java\com\mysql\jdbc\Driver.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\TlsSettings.properties
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\LocalizedErrorMessages.properties
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\demo\java\demo\x\devapi\DevApiSample.java.bak
   - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\demo\java\demo\x\devapi\DevApiSample.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\xdevapi\JsonDocTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\xdevapi\JsonDocTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\xdevapi\ExprParserTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\xdevapi\ExprParserTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\TimeUtilTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\TimeUtilTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\StringUtilsTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\StringUtilsTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\StringInspectorTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\util\StringInspectorTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\ZeroDateTimeToNullValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\ZeroDateTimeToNullValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\StringValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\StringValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlTimeValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlTimeValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlTimestampValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlTimestampValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlDateValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\SqlDateValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\ShortValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\ShortValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LongValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LongValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalTimeValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalTimeValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalDateValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalDateValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalDateTimeValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\LocalDateTimeValueFactoryTest.java
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\IntegerValueFactoryTest.java.bak
-  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\test\java\com\mysql\cj\result\IntegerValueFactoryTest.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\solarisMaxPerformance.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\maxPerformance.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\maxPerformance-8-0.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\fullDebug.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\coldFusion.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\clusterBase.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\configurations\3-0-Compat.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\resources\com\mysql\cj\util\TimeZoneMapping.properties
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\SimpleQuery.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\SimpleQuery.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\ServerPreparedQueryTestcaseGenerator.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\ServerPreparedQueryTestcaseGenerator.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\ServerPreparedQuery.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\ServerPreparedQuery.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NoSubInterceptorWrapper.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NoSubInterceptorWrapper.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeSession.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeSession.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryBindValue.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryBindValue.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryBindings.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryBindings.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryAttributesBindings.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeQueryAttributesBindings.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeCharsetSettings.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\NativeCharsetSettings.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\MysqlxSession.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\MysqlxSession.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\LicenseConfiguration.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\LicenseConfiguration.java
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\DataStoreMetadataImpl.java.bak
+  - src\mysql-connector-j-9.4.0\mysql-connector-j-9.4.0\src\main\core-impl\java\com\mysql\cj\DataStoreMetadataImpl.java
 
-  ... and 1180 more files omitted to save context space.
+  ... and 1183 more files omitted to save context space.

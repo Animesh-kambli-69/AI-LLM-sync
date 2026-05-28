@@ -9,8 +9,29 @@
     {
       "event": "Worker completed step: give me a code for circular linked list and explain it \n",
       "at": "2026-05-24T14:43:32.404Z"
+    },
+    {
+      "event": "Critic: issues found (retry 1)",
+      "at": "2026-05-24T14:44:50.070Z"
+    },
+    {
+      "event": "Worker completed step: give me a code for circular linked list and explain it \n",
+      "at": "2026-05-24T14:45:22.303Z"
+    },
+    {
+      "event": "Critic: issues found (retry 2)",
+      "at": "2026-05-24T14:46:10.062Z"
+    },
+    {
+      "event": "Worker completed step: give me a code for circular linked list and explain it \n",
+      "at": "2026-05-24T14:46:42.671Z"
+    },
+    {
+      "event": "Critic: issues found (retry 3)",
+      "at": "2026-05-24T14:47:25.473Z"
     }
   ],
   "startedAt": "2026-05-24T14:41:41.264Z",
-  "status": "running"
+  "status": "complete",
+  "endedAt": "2026-05-24T14:47:25.479Z"
 }
